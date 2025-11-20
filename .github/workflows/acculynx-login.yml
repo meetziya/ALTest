@@ -1,0 +1,30 @@
+name: AccuLynx Login and Cookie Fetcher
+
+on:
+  repository_dispatch:
+    types: [acculynx-login]
+
+jobs:
+  run-login:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install deps
+        run: |
+          npm install puppeteer
+
+      - name: Run login script
+        id: login
+        run: |
+          node login.js '${{ github.event.client_payload.id }}' '${{ github.event.client_payload.email }}' '${{ github.event.client_payload.key }}'
+
+      - name: Output cookies
+        run: echo "COOKIES=${{ steps.login.outputs.cookies }}" 
