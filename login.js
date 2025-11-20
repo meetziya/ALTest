@@ -17,34 +17,24 @@ const puppeteer = require("puppeteer");
 
     const page = await browser.newPage();
 
-    // 1. Go to login page
     await page.goto("https://my.acculynx.com/signin", {
         waitUntil: "networkidle2"
     });
 
-    // 2. Fill email
     await page.type("input#Email", Email, { delay: 30 });
-
-    // 3. Fill password
     await page.type("input#Password", Key, { delay: 30 });
-
-    // 4. Click login
     await page.click("button#js-sign-in-identity");
 
-    // Wait for login redirect
     await page.waitForNavigation({ waitUntil: "networkidle2" });
 
-    // 5. Switch company
     const switchURL = `https://my.acculynx.com/signin/SwitchCompany?CompanyID=${ID}`;
     await page.goto(switchURL, { waitUntil: "networkidle2" });
 
-    // 6. Get cookies
+    // --- COOKIE FORMATTING ---
     const cookies = await page.cookies();
+    const formatted = cookies.map(c => c.value).join("; ");
 
     await browser.close();
 
-    const cookiesJSON = JSON.stringify(cookies);
-
-    // Print GitHub Action output
-    console.log(`::set-output name=cookies::${cookiesJSON}`);
+    console.log(`::set-output name=cookies::${formatted}`);
 })();
